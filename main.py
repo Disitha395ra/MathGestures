@@ -5,16 +5,13 @@ from cvzone.HandTrackingModule import HandDetector
 # Initialize the webcam to capture video
 # The '2' indicates the third camera connected to your computer; '0' would usually refer to the built-in camera
 cap = cv2.VideoCapture(0)
+cap.set(3,1280)
+cap.set(4,680)
 
 # Initialize the HandDetector class with the given parameters
 detector = HandDetector(staticMode=False, maxHands=1, modelComplexity=1, detectionCon=0.5, minTrackCon=0.5)
 
-# Continuously get frames from the webcam
-while True:
-    # Capture each frame from the webcam
-    # 'success' will be True if the frame is successfully captured, 'img' will contain the frame
-    success, img = cap.read()
-
+def getHandInfo(img):
     # Find hands in the current frame
     # The 'draw' parameter draws landmarks and hand outlines on the image if set to True
     # The 'flipType' parameter flips the image, making it easier for some detections
@@ -23,19 +20,26 @@ while True:
     # Check if any hands are detected
     if hands:
         # Information for the first hand detected
-        hand1 = hands[0]  # Get the first hand detected
-        lmList1 = hand1["lmList"]  # List of 21 landmarks for the first hand
-        bbox1 = hand1["bbox"]  # Bounding box around the first hand (x,y,w,h coordinates)
-        center1 = hand1['center']  # Center coordinates of the first hand
-        handType1 = hand1["type"]  # Type of the first hand ("Left" or "Right")
-
+        hand = hands[0]  # Get the first hand detected
+        lmList = hand["lmList"]  # List of 21 landmarks for the first hand
         # Count the number of fingers up for the first hand
-        fingers1 = detector.fingersUp(hand1)
-        print(f'H1 = {fingers1.count(1)}', end=" ")  # Print the count of fingers that are up
+        fingers = detector.fingersUp(hand)
+        print(fingers)
+        return fingers,lmList
+    else:
+        return None
 
-        # Calculate distance between specific landmarks on the first hand and draw it on the image
-        length, info, img = detector.findDistance(lmList1[8][0:2], lmList1[12][0:2], img, color=(255, 0, 255),
-                                                  scale=10)
+
+# Continuously get frames from the webcam
+while True:
+    # Capture each frame from the webcam
+    # 'success' will be True if the frame is successfully captured, 'img' will contain the frame
+    success, img = cap.read()
+    info = getHandInfo(img)
+    if info:
+        fingers,lmList = info
+        print(fingers)
+
     # Display the image in a window
     cv2.imshow("Image", img)
 
