@@ -81,7 +81,7 @@ while run:
     if info:
         fingers, lmList = info
         prev_pos, canvas = draw(info, prev_pos, canvas)
-        output_text = sendToAI(model, fingers, canvas) or ""  # Ensure it's a string
+        output_text = sendToAI(model, fingers, canvas) or ""  
 
     image_combines = cv2.addWeighted(img, 0.7, canvas, 0.3, 0)
     FRAME_WINDOW.image(image_combines, channels="BGR")
